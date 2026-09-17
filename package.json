@@ -1,0 +1,51 @@
+{
+  "name": "barcode-scanner-typescript",
+  "version": "0.1.0",
+  "description": "Cross-platform mobile sample (Ionic + Angular + TypeScript) that connects over BLE to a barcode/RFID scanner and handles scanner data (barcode, NFC tags, raw frames) through one generic decode path.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "lint": "ng lint",
+    "cap:add": "cap add",
+    "cap:sync": "cap sync",
+    "cap:open": "cap open"
+  },
+  "dependencies": {
+    "@angular/animations": "^17.3.0",
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/platform-browser-dynamic": "^17.3.0",
+    "@angular/router": "^17.3.0",
+    "@capacitor-community/bluetooth-le": "^6.0.2",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/haptics": "^6.1.0",
+    "@ionic/angular": "^7.8.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.6.2",
+    "zone.js": "~0.14.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.0",
+    "@angular/cli": "^17.3.0",
+    "@angular/compiler-cli": "^17.3.0",
+    "@angular/language-service": "^17.3.0",
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/ios": "^6.1.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.4.2"
+  }
+}

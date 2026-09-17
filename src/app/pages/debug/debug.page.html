@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Debug</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-button expand="block" color="secondary" (click)="debugToClipboard()">
+      <ion-icon name="copy-outline" slot="start"></ion-icon>
+      Copy debug log
+    </ion-button>
+    <ion-button expand="block" color="danger" fill="outline" (click)="emptyDebug()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Clear log
+    </ion-button>
+  </ion-item>
+
+  <pre class="mono-text debug-log">{{ content || 'No debug content yet.' }}</pre>
+</ion-content>

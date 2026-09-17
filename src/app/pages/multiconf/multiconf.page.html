@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Multi configuration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p>
+    Apply configuration files to this scanner. A multi-conf file describes the
+    scanner registers to set in one shot. You can paste its content or pick a
+    file from the device.
+  </p>
+
+  <ion-button expand="block" color="primary" (click)="pasteConfiguration()">
+    <ion-icon name="clipboard-outline" slot="start"></ion-icon>
+    Paste a configuration
+  </ion-button>
+
+  <ion-button expand="block" color="secondary" (click)="chooseFile()">
+    <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+    Choose a file
+  </ion-button>
+</ion-content>

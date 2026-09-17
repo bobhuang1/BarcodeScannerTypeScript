@@ -1,0 +1,32 @@
+/* App-wide tweaks */
+html,
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.mono-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.connection-status {
+  width: 100%;
+  text-align: center;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.status-ok {
+  background: var(--ion-color-success-tint);
+  color: var(--ion-color-success);
+}
+
+.status-ko {
+  background: var(--ion-color-danger-tint);
+  color: var(--ion-color-danger);
+}
+
+.rssi-pill {
+  font-size: 0.8em;
+  font-weight: 600;
+}

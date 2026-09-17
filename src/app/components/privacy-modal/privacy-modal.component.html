@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Privacy statement</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p>
+    This sample application connects to your barcode / RFID scanner over
+    Bluetooth Low Energy and displays the data it scans.
+  </p>
+
+  <h3>What it collects</h3>
+  <p>
+    Everything happens on-device. The application does not collect, send or
+    store any personal data. Scanned content is only kept in memory during the
+    current session so it can be shown on the screen.
+  </p>
+
+  <h3>Local preferences</h3>
+  <p>
+    A few options (vibration, opening URLs, debug log, input height) are stored
+    locally on the device. You can clear them at any time by removing the
+    application.
+  </p>
+
+  <h3>No analytics</h3>
+  <p>
+    There is no analytics, no crash reporting and no advertising SDK in this
+    sample.
+  </p>
+
+  <ion-button expand="block" color="primary" (click)="agree()">
+    I understand
+  </ion-button>
+</ion-content>

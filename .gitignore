@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+www/
+out-tsc/
+
+# Angular CLI cache
+.angular/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# iOS / macOS
+.DS_Store
+capacitor-cordova-ios-plugins
+
+# Capacitor native platform folders (uncomment when native code should be committed)
+# android/
+# ios/

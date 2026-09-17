@@ -1,0 +1,17 @@
+ion-textarea {
+  border: 1px solid var(--ion-color-step-300, #ccc);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.result {
+  margin-top: 16px;
+  padding: 8px;
+  background: var(--ion-color-light, #f4f4f4);
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+ion-button {
+  margin-top: 8px;
+}

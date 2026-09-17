@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>About</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="logo">
+    <ion-icon name="scan-outline" size="large"></ion-icon>
+  </div>
+
+  <ion-list>
+    <ion-item>
+      <ion-label>App name</ion-label>
+      <ion-note slot="end">Barcode Scanner TypeScript</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>Version</ion-label>
+      <ion-note slot="end">{{ version }}</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>Platform</ion-label>
+      <ion-note slot="end">{{ state.platform }}</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" fill="outline" (click)="openPrivacyStatement()">
+    <ion-icon name="document-text-outline" slot="start"></ion-icon>
+    Privacy statement
+  </ion-button>
+
+  <p class="disclaimer">
+    Sample project. No analytics, no crash reporting, no account required.
+  </p>
+</ion-content>

@@ -1,0 +1,165 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Scanner control</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label>
+      <h2>Scanner {{ device.UUID }}</h2>
+      <p class="mono-text">Control commands (0x90..0x94)</p>
+    </ion-label>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Command code</ion-label>
+    <ion-input [(ngModel)]="controlService.cmdCode" placeholder="0x00"></ion-input>
+  </ion-item>
+
+  <ng-container *ngIf="controlService.cmdCode === '0x90'">
+    <ion-item>
+      <ion-label position="stacked">UI sequence</ion-label>
+      <ion-input [(ngModel)]="controlService.ui_sequence" placeholder="0x01"></ion-input>
+    </ion-item>
+  </ng-container>
+
+  <ng-container *ngIf="controlService.cmdCode === '0x91'">
+    <ng-container *ngIf="state.isOlderThan144; else fw144Leds">
+      <ion-item>
+        <ion-label position="stacked">LEDs duration</ion-label>
+        <ion-input type="number" [(ngModel)]="controlService.ledsduration"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>RFID red</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedRfidRed" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>RFID green</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedRfidGreen" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>RFID blue</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedRfidBlue" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Power red</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedPwrRed" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Power green</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedPwrGreen" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Power blue</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedPwrBlue" class="num"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Bluetooth</ion-label>
+        <ion-input slot="end" [(ngModel)]="controlService.LedBluetooth" class="num"></ion-input>
+      </ion-item>
+    </ng-container>
+    <ng-template #fw144Leds>
+      <ion-item>
+        <ion-label position="stacked">Power delay (ms)</ion-label>
+        <ion-input type="number" [(ngModel)]="controlService.firmware144PowerDelai"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144PowerRed"></ion-toggle>
+        <ion-label>Power red</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144PowerGreen"></ion-toggle>
+        <ion-label>Power green</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144PowerBlue"></ion-toggle>
+        <ion-label>Power blue</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Power mode</ion-label>
+        <ion-input [(ngModel)]="controlService.firmware144PowerMode"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Scan delay (ms)</ion-label>
+        <ion-input type="number" [(ngModel)]="controlService.firmware144ScanDelai"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144ScanRed"></ion-toggle>
+        <ion-label>Scan red</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144ScanGreen"></ion-toggle>
+        <ion-label>Scan green</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144ScanBlue"></ion-toggle>
+        <ion-label>Scan blue</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Scan mode</ion-label>
+        <ion-input [(ngModel)]="controlService.firmware144ScanMode"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">BLE delay (ms)</ion-label>
+        <ion-input type="number" [(ngModel)]="controlService.firmware144BleDelai"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-toggle [(ngModel)]="controlService.firmware144BleBlue"></ion-toggle>
+        <ion-label>BLE blue</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">BLE mode</ion-label>
+        <ion-input [(ngModel)]="controlService.firmware144BleMode"></ion-input>
+      </ion-item>
+    </ng-template>
+  </ng-container>
+
+  <ng-container *ngIf="controlService.cmdCode === '0x92'">
+    <ion-item>
+      <ion-label position="stacked">Buzzer duration</ion-label>
+      <ion-input type="number" [(ngModel)]="controlService.buzzerduration"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Buzzer frequency</ion-label>
+      <ion-input [(ngModel)]="controlService.buzzerfrequency"></ion-input>
+    </ion-item>
+  </ng-container>
+
+  <ng-container *ngIf="controlService.cmdCode === '0x94'">
+    <ion-item>
+      <ion-label position="stacked">Repeat (255 = infinite)</ion-label>
+      <ion-input type="number" [(ngModel)]="controlService.vibratorrepeat"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="controlService.vibratorrepeat !== 255">
+      <ion-label position="stacked">Vibration duration</ion-label>
+      <ion-input type="number" [(ngModel)]="controlService.vibratorduration"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="controlService.vibratorrepeat !== 255">
+      <ion-label position="stacked">Decay</ion-label>
+      <ion-input type="number" [(ngModel)]="controlService.decay"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="controlService.vibratorrepeat === 255">
+      <ion-label position="stacked">Pulse pattern</ion-label>
+      <ion-input [(ngModel)]="controlService.pulsepattern"></ion-input>
+    </ion-item>
+  </ng-container>
+
+  <div class="ion-padding">
+    <ion-button expand="block" color="primary" (click)="sendControlService()">
+      Send command
+    </ion-button>
+  </div>
+
+  <ion-item *ngIf="controlService.controlServiceResult">
+    <ion-label>
+      <h2>Command bytes</h2>
+      <p class="mono-text">{{ controlService.controlServiceResult }}</p>
+    </ion-label>
+  </ion-item>
+</ion-content>

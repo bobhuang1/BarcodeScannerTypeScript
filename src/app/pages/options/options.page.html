@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Options</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-toggle [(ngModel)]="settings.debug"></ion-toggle>
+      <ion-label>Debug log</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-toggle [(ngModel)]="settings.vibrate"></ion-toggle>
+      <ion-label>Vibrate on scan</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-toggle [(ngModel)]="settings.openUrls"></ion-toggle>
+      <ion-label>Open scanned URLs</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">History input height (lines)</ion-label>
+      <ion-input
+        type="number"
+        min="1"
+        max="20"
+        [(ngModel)]="settings.inputHeight"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="primary" (click)="saveSettings()">
+    Save settings
+  </ion-button>
+</ion-content>

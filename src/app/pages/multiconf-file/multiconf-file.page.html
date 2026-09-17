@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Configuration file</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p>Pick a multi-conf file from the device storage.</p>
+
+  <input
+    #fileInput
+    type="file"
+    accept=".txt,.ini,.conf,text/plain"
+    hidden
+    (change)="onFileSelected($event)"
+  />
+
+  <ion-button expand="block" color="primary" (click)="fileInput.click()">
+    <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+    Choose a file
+  </ion-button>
+
+  <ion-item *ngIf="fileName">
+    <ion-label>
+      <h2>{{ fileName }}</h2>
+    </ion-label>
+  </ion-item>
+
+  <pre *ngIf="result" class="mono-text result">{{ result }}</pre>
+</ion-content>

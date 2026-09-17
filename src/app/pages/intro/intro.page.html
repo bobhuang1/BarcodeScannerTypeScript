@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Welcome</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="welcome">
+    <ion-icon name="scan-outline" size="large"></ion-icon>
+    <h1>Barcode Scanner – TypeScript sample</h1>
+    <p>
+      This sample connects to a barcode / RFID scanner over Bluetooth Low
+      Energy. Scan barcodes, NFC tags and raw frames, configure the device and
+      inspect its information.
+    </p>
+  </div>
+
+  <ion-button expand="block" fill="outline" (click)="openPrivacyStatement()">
+    <ion-icon name="document-text-outline" slot="start"></ion-icon>
+    Privacy statement
+  </ion-button>
+
+  <ion-button expand="block" color="primary" (click)="getStarted()">
+    Get started
+  </ion-button>
+</ion-content>
