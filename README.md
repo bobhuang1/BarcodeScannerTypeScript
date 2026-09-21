@@ -2,7 +2,7 @@
 
 Cross-platform **mobile sample** built with **Ionic + Angular + TypeScript** that talks to a Socket Mobile–style BLE barcode/RFID scanner (e.g. a Socket Mobile D600).
 
-This project is a from-scratch, TypeScript port of an older Ionic 1 / AngularJS + Cordova app. It keeps the full feature set but:
+This is sample code for a modern mobile scanner app built from scratch. It keeps a full feature set but:
 
 - runs on **Ionic 7 / Angular 17 / Capacitor 6** using `@capacitor-community/bluetooth-le`,
 - handles **generic scanner data** (barcode, NFC tags, raw frames) through **one decode path**,
@@ -46,8 +46,8 @@ src/
     app.component.*            Side menu shell + startup (first-run, settings, version)
     services/
       settings.service.ts      localStorage wrapper
-      logger.service.ts        debug content capture (_d / _do ports)
-      utils.ts                 byte/hex/string helpers (port of the old misc.js)
+      logger.service.ts        debug content capture
+      utils.ts                 byte/hex/string helpers
       ble.service.ts           BLE transport over @capacitor-community/bluetooth-le
       blocks.service.ts        configuration block encode/decode
       scanner-data.service.ts  generic decoder for barcode / NFC / raw frames
