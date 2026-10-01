@@ -81,4 +81,4 @@ Capacitor's dev-server flow; Bluetooth itself requires a device (Web Bluetooth i
 
 ## License
 
-MIT (see `LICENSE`).
+This project is free software, released under the **GNU General Public License v3.0**. You may redistribute and/or modify it under those terms; see [LICENSE.md](LICENSE.md) for the full text.

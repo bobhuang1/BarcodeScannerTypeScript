@@ -2,7 +2,7 @@
   "name": "barcode-scanner-typescript",
   "version": "0.1.0",
   "description": "Cross-platform mobile sample (Ionic + Angular + TypeScript) that connects over BLE to a barcode/RFID scanner and handles scanner data (barcode, NFC tags, raw frames) through one generic decode path.",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "private": true,
   "scripts": {
     "start": "ng serve",
