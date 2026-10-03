@@ -77,7 +77,15 @@ Capacitor's dev-server flow; Bluetooth itself requires a device (Web Bluetooth i
 
 - The GATT profile lives in `src/app/services/ble.service.ts` (service/characteristic UUIDs).
 - The set of accepted product identifiers for multi-conf files lives in `src/app/services/multiconf-reader.service.ts` (see the `[general]` product check).
-- `openUrls` (Options screen) lets the app auto-open URL frames in the browser.
+- `openUrls` (Options screen) lets the app auto-open URL frames in the browser. It is
+  off by default: with it on, any NFC tag carrying a link opens that page without a tap.
+- Frames end with `0x00`. NFC frames start with a 2-character hex type code (`4F` = NFC
+  Forum); frames without a known code are treated as plain barcodes and passed through
+  unchanged. A barcode that happens to start with a known code is read as an NFC frame.
+
+## Tests
+
+`npm test -- --watch=false --browsers=ChromeHeadless` runs the decoder and utility specs.
 
 ## License
 

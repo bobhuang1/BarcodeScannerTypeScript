@@ -8,7 +8,7 @@
 const EOL = '\n';
 
 export interface IniObject {
-  [section: string]: unknown;
+  // Sections map to nested objects, top-level keys to values.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
@@ -94,11 +94,11 @@ export function decodeIni(str: string): IniObject {
       return;
     }
     if (match[1] !== undefined) {
-      const section = unsafe(match[1]);
+      const section = String(unsafe(match[1]));
       p = out[section] = out.hasOwnProperty(section) ? out[section] as Record<string, unknown> : {};
       return;
     }
-    const key = unsafe(match[2]);
+    const key = String(unsafe(match[2]));
     let value: unknown = match[3] ? unsafe(match[4] || '') : true;
 
     switch (value) {

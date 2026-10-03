@@ -26,7 +26,7 @@ export class AppStateService {
   /** Map of deviceId -> friendly name for still-known devices. */
   scannedDevices: Record<string, string> = {};
   /** Open URL frames (NFC Forum / Thinfilm barcode) in the browser. */
-  openUrls = true;
+  openUrls = false;
   /** Firmware is older than 1.44 (changes the "drive LEDs" command layout). */
   isOlderThan144 = true;
   /** Height (lines) used for the history input on the connect screen. */

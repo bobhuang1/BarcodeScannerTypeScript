@@ -3,7 +3,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 
-if (window['process'] && window['process'].env && window['process'].env['NODE_ENV'] === 'production') {
+const env = (window as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env;
+if (env?.['NODE_ENV'] === 'production') {
   enableProdMode();
 }
 

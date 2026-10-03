@@ -92,7 +92,7 @@ export function stringVersionToIntVersion(version: string): number {
   if (pointIndex === -1) {
     return 0;
   }
-  version = version.substr(0, pointIndex).replace('.', '');
+  version = version.substring(0, pointIndex).replace(/\./g, '');
   return parseInt(version, 10);
 }
 

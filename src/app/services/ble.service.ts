@@ -10,7 +10,8 @@ import { ScannerDataService } from './scanner-data.service';
 import {
   byteArrayToHexString,
   fromByteArrayToString,
-  stringVersionToIntVersion
+  stringVersionToIntVersion,
+  rssiToPercentage
 } from './utils';
 
 export interface DeviceInfoItem {
@@ -129,6 +130,7 @@ export class BleService {
    */
   async startScan(durationSeconds = this.state.scanDuration): Promise<void> {
     this.logger.d('BleService.startScan()');
+    this.clearScanTimer();
     this.state.isScanning = true;
 
     await BleClient.requestLEScan(
@@ -139,18 +141,20 @@ export class BleService {
       (result: ScanResult) => {
         this.logger.d('device found: ' + this.getDeviceNameFromAdvertisingData(result));
         const name = this.getDeviceNameFromAdvertisingData(result);
+        const rssi = result.rssi ?? -100;
         this.onDeviceFound.next({
-          id: result.deviceId,
+          id: result.device.deviceId,
           name,
-          rssi: result.rssi,
-          rssiPercent: this.rssiToPercent(result.rssi)
+          rssi,
+          rssiPercent: this.rssiToPercent(rssi)
         });
-        this.state.scannedDevices[result.deviceId] = name;
+        this.state.scannedDevices[result.device.deviceId] = name;
       }
     );
 
     // Stop the scan after the requested duration.
-    setTimeout(() => {
+    this.scanTimer = setTimeout(() => {
+      this.scanTimer = undefined;
       if (this.state.isScanning) {
         this.stopScan();
       }
@@ -159,6 +163,7 @@ export class BleService {
 
   async stopScan(): Promise<void> {
     this.logger.d('BleService.stopScan()');
+    this.clearScanTimer();
     this.state.isScanning = false;
     try {
       await BleClient.stopLEScan();
@@ -167,30 +172,27 @@ export class BleService {
     }
   }
 
+  private scanTimer?: ReturnType<typeof setTimeout>;
+
+  private clearScanTimer(): void {
+    if (this.scanTimer !== undefined) {
+      clearTimeout(this.scanTimer);
+      this.scanTimer = undefined;
+    }
+  }
+
   private rssiToPercent(rssi: number): number {
-    const abs = Math.abs(rssi);
-    if (abs > 95) {
-      return 0;
-    }
-    if (abs <= 30) {
-      return 100;
-    }
-    return Math.round(100 - (abs - 30));
+    return rssiToPercentage(rssi);
   }
 
   /**
-   * Extract the scanner's friendly name from the plugin scan result.
-   * Handles both the Android and the iOS advertising shapes.
+   * Extract the scanner's friendly name from the plugin scan result. The plugin
+   * already normalises the Android and iOS advertising data into localName and
+   * device.name.
    */
   getDeviceNameFromAdvertisingData(result: ScanResult): string {
-    const advertisement = (result.advertisement ?? {}) as Record<string, unknown>;
-    const localName =
-      result.localName ||
-      result.name ||
-      (advertisement['kCBAdvDataLocalName'] as string | undefined) ||
-      (advertisement['localName'] as string | undefined) ||
-      '';
-    return localName ? String(localName).trim() : 'Name not found';
+    const localName = result.localName || result.device.name || '';
+    return localName ? localName.trim() : 'Name not found';
   }
 
   // -------------------------------------------------------------------------
@@ -205,7 +207,10 @@ export class BleService {
     }
 
     this.currentDeviceId = deviceId;
-    this.state.isScanning = false;
+    // Stop scanning before connecting; a running scan slows connection setup on Android.
+    if (this.state.isScanning) {
+      await this.stopScan();
+    }
 
     this.status('Connecting to device', 'info');
     await BleClient.connect(deviceId, (id) => {
@@ -233,7 +238,8 @@ export class BleService {
 
   async isDeviceConnected(deviceId: string): Promise<boolean> {
     try {
-      return await BleClient.isConnected(deviceId);
+      const connected = await BleClient.getConnectedDevices([GATT_SCANNER_SERVICE]);
+      return connected.some((d) => d.deviceId === deviceId);
     } catch {
       return false;
     }
@@ -249,7 +255,7 @@ export class BleService {
     if (!this.isConnected) {
       throw new Error('Not connected');
     }
-    await BleClient.startNotification(
+    await BleClient.startNotifications(
       deviceId,
       GATT_SCANNER_SERVICE,
       GATT_SCANNER_DATA,
@@ -261,7 +267,7 @@ export class BleService {
 
   async endNotifyRfidScannerData(deviceId: string): Promise<void> {
     this.logger.d('BleService.endNotifyRfidScannerData()');
-    await BleClient.stopNotification(deviceId, GATT_SCANNER_SERVICE, GATT_SCANNER_DATA);
+    await BleClient.stopNotifications(deviceId, GATT_SCANNER_SERVICE, GATT_SCANNER_DATA);
   }
 
   // -------------------------------------------------------------------------
@@ -285,8 +291,7 @@ export class BleService {
         deviceId,
         GATT_CONFIG_SERVICE,
         GATT_CONFIG_CHARACTERISTIC,
-        this.uint8ArrayToDataView(block),
-        'ack'
+        this.uint8ArrayToDataView(block)
       );
     }
   }
@@ -300,7 +305,7 @@ export class BleService {
     if (!this.isConnected) {
       throw new Error('Not connected');
     }
-    await BleClient.startNotification(
+    await BleClient.startNotifications(
       deviceId,
       GATT_CONFIG_SERVICE,
       GATT_CONFIG_CHARACTERISTIC,
@@ -313,7 +318,7 @@ export class BleService {
   /** Stop the configuration service answer channel. */
   async endNotifyConfigService(deviceId: string): Promise<void> {
     this.logger.d('BleService.endNotifyConfigService()');
-    await BleClient.stopNotification(deviceId, GATT_CONFIG_SERVICE, GATT_CONFIG_CHARACTERISTIC);
+    await BleClient.stopNotifications(deviceId, GATT_CONFIG_SERVICE, GATT_CONFIG_CHARACTERISTIC);
   }
 
   // -------------------------------------------------------------------------
@@ -334,8 +339,7 @@ export class BleService {
       deviceId,
       GATT_SCANNER_SERVICE,
       GATT_SCANNER_CONTROL,
-      this.uint8ArrayToDataView(command),
-      'ack'
+      this.uint8ArrayToDataView(command)
     );
   }
 

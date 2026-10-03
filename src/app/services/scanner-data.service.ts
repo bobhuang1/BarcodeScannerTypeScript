@@ -24,19 +24,30 @@ export interface ScannedData {
   url?: string;
 }
 
+/** Card type reported for frames without a recognised 2-character type prefix. */
+export const PLAIN_BARCODE = 'Barcode';
+
 /**
  * Generic scanner-data decoder.
  *
  * The scanner streams frames over the data characteristic. A frame is a
- * sequence of bytes terminated by 0x00; the two leading bytes identify the
- * card/scanner data type (barcode symbology, NFC tag family, ...). Frames are
- * buffered until the end marker, then decoded and emitted once - one decode
- * path for barcodes, NFC tags and raw frames alike.
+ * sequence of bytes terminated by 0x00. NFC frames start with two ASCII hex
+ * characters naming the tag family (e.g. "4F" = NFC Forum); plain barcode
+ * frames carry the barcode text with no prefix. Frames are split on every
+ * 0x00 (a notification may hold the end of one frame and the start of the
+ * next), then decoded and emitted once - one decode path for barcodes, NFC
+ * tags and raw frames alike.
+ *
+ * Note: a barcode whose first two characters happen to be a known type code
+ * (e.g. "01...") is indistinguishable from a typed NFC frame in this protocol.
  */
 @Injectable()
 export class ScannerDataService {
   /** Emitted each time a full frame has been decoded. */
   onData: Subject<ScannedData> = new Subject<ScannedData>();
+
+  /** Upper bound for one frame, so a missing terminator can't grow the buffer forever. */
+  static readonly MAX_FRAME_BYTES = 4096;
 
   private pending = new Uint8Array(0);
 
@@ -63,24 +74,13 @@ export class ScannerDataService {
     };
 
     if (data.length < 2) {
-      return 'unknown';
+      return PLAIN_BARCODE;
     }
-    const cardType = parseInt(
-      String.fromCharCode(data[0]) + String.fromCharCode(data[1]),
-      16
-    );
-    return cardsType[cardType] ?? 'unknown';
-  }
-
-  /**
-   * Verify if we received all bytes of the current frame. A frame is finished
-   * when the received buffer ends with 0x00.
-   */
-  private isTransmitFinished(buffer: Uint8Array): boolean {
-    if (buffer.length < 2) {
-      return false;
+    const prefix = String.fromCharCode(data[0]) + String.fromCharCode(data[1]);
+    if (!/^[0-9A-Fa-f]{2}$/.test(prefix)) {
+      return PLAIN_BARCODE;
     }
-    return buffer[buffer.length - 1] === 0x00;
+    return cardsType[parseInt(prefix, 16)] ?? PLAIN_BARCODE;
   }
 
   /** Try to extract an URL from a Thinfilm NFC barcode payload. */
@@ -119,58 +119,77 @@ export class ScannerDataService {
    */
   onDataFromPeripheral(buffer: ArrayBuffer | Uint8Array): void {
     this.logger.d('ScannerDataService.onDataFromPeripheral()');
+
+    const data = new Uint8Array(buffer);
+    this.logger.d('    data in: 0x' + byteArrayToHexString(data));
+    if (data.length === 0) {
+      return;
+    }
+
+    this.pending = mergeUint8Arrays(this.pending, data);
+
+    // Decode every complete frame in the buffer; keep the unterminated tail.
+    let start = 0;
+    for (let i = 0; i < this.pending.length; i++) {
+      if (this.pending[i] === 0x00) {
+        const frame = this.pending.slice(start, i);
+        start = i + 1;
+        if (frame.length > 0) {
+          this.decodeFrame(frame);
+        }
+      }
+    }
+    this.pending = this.pending.slice(start);
+
+    if (this.pending.length > ScannerDataService.MAX_FRAME_BYTES) {
+      this.logger.d('Frame too long without an end marker; discarding ' + this.pending.length + ' bytes');
+      this.pending = new Uint8Array(0);
+    }
+  }
+
+  /** Decode one complete frame (without its 0x00 terminator) and emit it. */
+  private decodeFrame(frame: Uint8Array): void {
+    this.logger.d('Transmission finished');
     if (this.state.doVibrate) {
       Haptics.vibrate().catch(() => undefined);
     }
 
-    const data = new Uint8Array(buffer);
-    this.logger.d('    data in: 0x' + byteArrayToHexString(data));
+    const cardType = this.getCardTypeName(frame);
+    // Typed (NFC) frames start with the 2 type characters; plain barcodes don't.
+    const payload = cardType === PLAIN_BARCODE ? frame : frame.slice(2);
 
-    if (data.length > 0) {
-      this.pending = mergeUint8Arrays(this.pending, data);
+    let openedUrl = false;
+    let url: string | undefined;
+    let text = uint8ArrayToString(payload);
 
-      if (this.isTransmitFinished(this.pending)) {
-        this.logger.d('Transmission finished');
-
-        const cardType = this.getCardTypeName(this.pending);
-        // Strip the 2 type bytes and the trailing 0x00 end marker.
-        const payload = this.pending.slice(2, this.pending.length - 1);
-        this.pending = new Uint8Array(0);
-
-        let openedUrl = false;
-        let url: string | undefined;
-        let text = uint8ArrayToString(payload).replace(/\u0000/g, '');
-
-        if (cardType === 'NFC Forum') {
-          if (text.startsWith('http://') || text.startsWith('https://')) {
-            url = text;
-            if (this.state.openUrls) {
-              this.openExternalUrl(url);
-              openedUrl = true;
-            }
-          }
-        } else if (cardType === 'Thinfilm NFC Barcode') {
-          url = this.getUrlFromThinFilmTag(payload);
-          if (url.trim() !== '') {
-            // The payload carries its URL (same behaviour as the original app).
-            if (this.state.openUrls) {
-              this.openExternalUrl(url);
-              openedUrl = true;
-            }
-            text = url;
-          }
+    if (cardType === 'NFC Forum') {
+      if (text.startsWith('http://') || text.startsWith('https://')) {
+        url = text;
+        if (this.state.openUrls) {
+          this.openExternalUrl(url);
+          openedUrl = true;
         }
-
-        this.logger.d('data decoded: 0x' + byteArrayToHexString(payload));
-        this.onData.next({
-          text,
-          cardType,
-          raw: payload,
-          openedUrl,
-          url
-        });
+      }
+    } else if (cardType === 'Thinfilm NFC Barcode') {
+      url = this.getUrlFromThinFilmTag(payload);
+      if (url.trim() !== '') {
+        // The payload carries its URL (same behaviour as the original app).
+        if (this.state.openUrls) {
+          this.openExternalUrl(url);
+          openedUrl = true;
+        }
+        text = url;
       }
     }
+
+    this.logger.d('data decoded: 0x' + byteArrayToHexString(payload));
+    this.onData.next({
+      text,
+      cardType,
+      raw: payload,
+      openedUrl,
+      url
+    });
   }
 
   /** Reset the buffered frame. */

@@ -6,7 +6,7 @@ import { ToastController } from '@ionic/angular';
 export class ToastService {
   constructor(private toastController: ToastController) {}
 
-  async show(message: string, position: 'top' | 'center' | 'bottom' = 'bottom', duration = 2000): Promise<void> {
+  async show(message: string, position: 'top' | 'middle' | 'bottom' = 'bottom', duration = 2000): Promise<void> {
     const toast = await this.toastController.create({
       message,
       duration,

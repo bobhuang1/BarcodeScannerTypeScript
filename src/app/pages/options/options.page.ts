@@ -20,7 +20,7 @@ export class OptionsPage {
   settings = {
     debug: false,
     vibrate: false,
-    openUrls: true,
+    openUrls: false,
     inputHeight: 6
   };
 
